@@ -1,2 +1,4 @@
+.idea/
 sc/*
 __pycache__/
+*.txt

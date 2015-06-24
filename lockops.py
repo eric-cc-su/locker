@@ -6,6 +6,21 @@ import json
 import os, os.path
 import time
 
+from tempfile import mkstemp
+
+def authenticate(initkey):
+	fd, tpath = mkstemp()
+	directory = os.path.dirname(tpath)
+	os.close(fd)
+	os.remove(tpath)
+	for fname in os.listdir(directory):
+		if fname.endswith(initkey):
+			return True
+	return False
+
+def decrypt_entry():
+	print("decrypt")
+
 def import_file(filepath, lineformat, sray):
 	key = Fernet.generate_key()
 	f = Fernet(key)
@@ -45,5 +60,35 @@ def import_file(filepath, lineformat, sray):
 	except:
 		pass
 
+	if not load_fp():
+		raise Exception("No existing repository file")
+	scw(sray)
+ 
+def load_fp():  # Retrieve JSON file
+	with open("sc/dump.json","r") as dfile:
+		fp = json.load(dfile)
+		if len(fp) > 0:
+			return fp
+	return False
+
+# https://www.logilab.org/blogentry/17873
+# https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp
+def ics(cusuffix):  # Create secure tmp file
+	fd, tpath = mkstemp(suffix = cusuffix)
+	os.close(fd)
 	with open("sc/dump.json","w") as dfile:
-		json.dump(sray,dfile)
+		json.dump(tpath, dfile)
+
+def rsc(blocksize=5000):  # Read secure tmp file
+	fp = load_fp()
+	rscf = os.open(fp, os.O_RDONLY)
+	obj = os.read(rscf, blocksize)
+	os.close(rscf)
+	return obj
+
+def scw(data):  # Write secure tmp file
+	obj = bytes(json.dumps(data),"utf-8")
+	fp = load_fp()
+	scwf = os.open(fp, os.O_WRONLY)
+	os.write(scwf, obj)
+	os.close(scwf)

@@ -3,6 +3,7 @@ try:
 except:
 	raise Exception("The system is not properly initialized")
 
+import json
 import lockops
 import os
 import time
@@ -11,23 +12,54 @@ EXIT = True
 IFILE = None
 IFORMAT = None
 MTB = {}
+UPRF = ""
 
-def screen_import():
-	global IFILE
+def gen_screen(prompt, input_text="INPUT: ", back=False, menu=None):
 	os.system('cls')
 	print("\t*************************************************")
-	print("\t***              Locker - Import              ***")
+	if menu is None:
+		print("\t***                  Locker                   ***")
+	else:
+		print(menu)
 	print("\t***                                           ***")
 	print("\t***                                           ***")
-	print("\t*** INPUT FILENAME                            ***")
+	print(prompt)
 	print("\t***                                           ***")
-	print("\t*** :back   - back to main menu               ***")
+	print("\t***                                           ***")
+	print("\t***                                           ***")
+	print("\t***                                           ***")
+	print("\t***                                           ***")
+	if back:
+		print("\t***           :back  - previous menu          ***")
+	else:
+		print("\t***         :q     - close application        ***")
 	print("\t*************************************************")
-	ks = input('FILENAME: ').strip().lower()
+	return( input(input_text) )
+
+def screen_decrypt():
+	prompt = "\t*** INPUT ENTRY LABEL                         ***"
+	menu = "\t***              Locker - Decrypt             ***"
+	ks = gen_screen(prompt ,'LABEL: ', True).strip().lower()
 	if ks == ":back":
 		screen_main()
 	elif ks == ":q":
 		EXIT = False
+		return
+	else:
+		decrypt_entry()
+
+def screen_import():
+	global IFILE
+	os.system('cls')
+	menu = "\t***              Locker - Import              ***"
+	prompt = "\t***               INPUT FILENAME              ***"
+
+	ks = gen_screen(prompt, "FILENAME: ", True, menu).strip().lower()
+	if ks == ":back":
+		screen_main()
+	elif ks == ":q":
+		EXIT = False
+		return
 	else:
 		try:
 			with open(ks, "r") as test:
@@ -61,6 +93,7 @@ def screen_import2():
 		screen_import()
 	elif ks == ":q":
 		EXIT = False
+		return
 	else:
 		IFORMAT = ks
 		farray = lockops.import_file(IFILE, IFORMAT, MTB)
@@ -78,7 +111,7 @@ def screen_main():
 	global MTB
 	os.system('cls')
 	print("\t*************************************************")
-	print("\t***              Locker - Import              ***")
+	print("\t***                  Locker                   ***")
 	print("\t***                                           ***")
 	print("\t***                                           ***")
 	print("\t***                                           ***")
@@ -86,8 +119,9 @@ def screen_main():
 	print("\t*** import - import from text file            ***")
 	print("\t*** new    - create new entry                 ***")
 	print("\t*** delete - delete entry                     ***")
+	print("\t*** decrypt- decrypt entry                    ***")
 	print("\t***                                           ***")
-	print("\t*** exit   - close application                ***")
+	print("\t*** :q     - close application                ***")
 	print("\t*************************************************")
 	ks = input("INPUT: ").strip().lower()
 	if ks == 'exit':
@@ -98,7 +132,28 @@ def screen_main():
 		screen_list()
 	elif ks == "import":
 		screen_import()
+	elif ks == "decrypt":
+		screen_decrypt()
+	return
 
-while EXIT:
-	screen_main()
+def cntn_main():
+	while EXIT:
+		screen_main()
+
+	os.system('cls')
+	return
+
+#*************************************** MAIN ********************************
+os.system('cls')
+apwd = gen_screen("\t***          INPUT LOCKER COMBINATION         ***")
+if apwd != ":q":
+	if not lockops.authenticate(apwd):
+		prmpt = input("Combination is unrecognized. Create new repository? (y/n)")
+		if prmpt == "y":
+			lockops.ics(apwd)
+			cntn_main()
+	else:
+		MTB = json.loads((lockops.rsc()).decode('utf-8'))
+		time.sleep(2)
+		cntn_main()
 os.system('cls')
