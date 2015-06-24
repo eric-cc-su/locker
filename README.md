@@ -62,8 +62,14 @@ In development.
 
 In development.
 
-***DISCLAIMER***: *I know extremely little about developing programs for encryption and security. The `experimental, trying-to-learn-new-things` designation above is **EXTREMELY IMPORTANT** to note as this is an **IN PROGRESS** project to teach myself more about Python and security. I am **NOT** responsible for any lost or compromised sensitive data that may result from the use of this code.*
+#***DISCLAIMER***
+
+*I know extremely little about developing programs for encryption and security. The `experimental, trying-to-learn-new-things` designation above is* ***EXTREMELY IMPORTANT*** *to note as this is an* ***IN PROGRESS*** *project to teach myself more about Python and security. I am* ***NOT*** *responsible for any lost or compromised sensitive data that may result from the use of this code.*
 
 ![You Know Nothing](http://i3.kym-cdn.com/photos/images/newsfeed/000/527/985/04f.gif)
 
 *([Know Your Meme](http://knowyourmeme.com/memes/you-know-nothing-jon-snow))*
+
+*This code is licensed under the MIT License and under copyright by Eric Su*
+
+&copy; 2015 Eric Su
