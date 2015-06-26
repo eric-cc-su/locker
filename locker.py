@@ -6,6 +6,7 @@ except:
 import json
 import lockops
 import os
+import platform
 import time
 
 EXIT = True
@@ -14,8 +15,14 @@ IFORMAT = None
 MTB = {}
 UPRF = ""
 
+def clear_screen():
+    if platform.system() in ['Darwin', 'Linux']:  # Mac & Linux
+        os.system('clear')
+    else:
+        os.system('cls')
+
 def gen_screen(prompt, input_text="INPUT: ", back=False, menu=None):
-    os.system('cls')
+    clear_screen()
     print("\t*************************************************")
     if menu is None:
         print("\t***                  Locker                   ***")
@@ -43,11 +50,11 @@ def screen_decrypt():
     if ks == ":q":
         screen_main()
     else:
-        lockops.decrypt_entry()
+        lockops.decrypt_entry(ks)
 
 def screen_import():
     global IFILE
-    os.system('cls')
+    clear_screen()
     menu = "\t***              Locker - Import              ***"
     prompt = "\t***               INPUT FILENAME              ***"
 
@@ -69,7 +76,7 @@ def screen_import():
 def screen_import2():
     global IFORMAT
     global MTB
-    os.system('cls')
+    clear_screen()
     print("\t*************************************************")
     print("\t***              Locker - Import              ***")
     print("\t***                                           ***")
@@ -96,8 +103,7 @@ def screen_import2():
 
 def screen_list():
     global MTB
-    os.system('cls')
-    print(type(MTB))
+    clear_screen()
     try:
         for key, val in MTB.items():
             print(key + ": " + str(val))
@@ -109,7 +115,7 @@ def screen_list():
 def screen_main():
     global EXIT
     global MTB
-    os.system('cls')
+    clear_screen()
     print("\t*************************************************")
     print("\t***                  Locker                   ***")
     print("\t***                                           ***")
@@ -132,6 +138,10 @@ def screen_main():
         screen_list()
     elif ks == "import":
         screen_import()
+    elif ks == "new":
+        pass
+    elif ks == "delete":
+        pass
     elif ks == "decrypt":
         screen_decrypt()
     return
@@ -141,11 +151,11 @@ def cntn_main():
         screen_main()
     if not lockops.dir_search(None, True):  # Save file
         lockops.write_secure_tfile(MTB)
-    os.system('cls')
+    clear_screen()
     return
 
 #*************************************** MAIN ********************************
-os.system('cls')
+clear_screen()
 apwd = gen_screen("\t***          INPUT LOCKER COMBINATION         ***")
 if apwd != ":q":
     if not lockops.dir_search(apwd, True, True):
@@ -157,4 +167,4 @@ if apwd != ":q":
         MTB = lockops.read_secure_tfile()
         lockops.load_key()
         cntn_main()
-os.system('cls')
+clear_screen()

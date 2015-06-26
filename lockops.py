@@ -37,7 +37,9 @@ def dir_search(suf, bool=False, kfind=False):
     return False
 
 
-def decrypt_entry():
+def decrypt_entry(label):
+    key = bin_dec(load_key().decode())
+    f = Fernet(key)
     print("decrypt")
 
 
