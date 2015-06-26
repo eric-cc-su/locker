@@ -104,7 +104,6 @@ def screen_list():
             print()
     except:
         print(MTB)
-        time.sleep(2)
     input("Continue: ")
 
 def screen_main():
@@ -149,13 +148,13 @@ def cntn_main():
 os.system('cls')
 apwd = gen_screen("\t***          INPUT LOCKER COMBINATION         ***")
 if apwd != ":q":
-    if not lockops.dir_search(apwd, True):
+    if not lockops.dir_search(apwd, True, True):
         prmpt = input("Combination is unrecognized. Create new repository? (y/n)")
         if prmpt == "y":
             lockops.init_secure_tfile(apwd)
             cntn_main()
     else:
-        # MTB = json.loads((lockops.read_secure_tfile()).decode('utf-8'))
         MTB = lockops.read_secure_tfile()
+        lockops.load_key()
         cntn_main()
 os.system('cls')
