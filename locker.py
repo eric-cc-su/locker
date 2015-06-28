@@ -7,8 +7,11 @@ import json
 import lockops
 import os
 import platform
+import sys
 import time
+import traceback
 
+NULLCLS = False
 EXIT = True
 IFILE = None
 IFORMAT = None
@@ -16,10 +19,12 @@ MTB = {}
 UPRF = ""
 
 def clear_screen():
-    if platform.system() in ['Darwin', 'Linux']:  # Mac & Linux
-        os.system('clear')
-    else:
-        os.system('cls')
+    global NULLCLS
+    if not NULLCLS:
+        if platform.system() in ['Darwin', 'Linux']:  # Mac & Linux
+            os.system('clear')
+        else:
+            os.system('cls')
 
 def gen_screen(prompt, input_text="INPUT: ", back=False, menu=None):
     clear_screen()
@@ -30,7 +35,11 @@ def gen_screen(prompt, input_text="INPUT: ", back=False, menu=None):
         print(menu)
     print("\t***                                           ***")
     print("\t***                                           ***")
-    print(prompt)
+    if type(prompt) == str:
+        print(prompt)
+    elif type(prompt) == list:
+        for line in prompt:
+            print(line)
     print("\t***                                           ***")
     print("\t***                                           ***")
     print("\t***                                           ***")
@@ -77,41 +86,56 @@ def screen_import():
 def screen_import2():
     global IFORMAT
     global MTB
-    clear_screen()
-    print("\t*************************************************")
-    print("\t***              Locker - Import              ***")
-    print("\t***                                           ***")
-    print("\t***                                           ***")
-    print("\t*** Using labels 'LABEL' and 'PWD':           ***")
-    print("\t*** Give format of file lines                 ***")
-    print("\t***                                           ***")
-    print("\t*** ex:                                       ***")
-    print("\t*** `Facebook - password` --> `LABEL - PWD`   ***")
-    print("\t***                                           ***")
-    print("\t***           :q   - previous menu            ***")
-    print("\t*************************************************")
-    ks = input('FORMAT: ')
+
+    menu = "\t***              Locker - Import              ***"
+
+    prompt = ["\t*** Using labels 'LABEL' and 'PWD':           ***",
+        "\t*** Give format of file lines                 ***",
+        "\t***                                           ***",
+        "\t*** ex:                                       ***",
+        "\t*** `Facebook - password` --> `LABEL - PWD`   ***"]
+
+    ks = gen_screen(prompt, 'FORMAT: ', True, menu)
     if ks == ":q":
         screen_import()
     else:
         IFORMAT = ks
+        MTB = lockops.import_file(IFILE, IFORMAT, MTB)
+        """
         try:
             MTB = lockops.import_file(IFILE, IFORMAT, MTB)
-        except ValueError:
+        except ValueError as ex:
             print("FORMAT NOT FOUND - Please input exact format of file lines")
+            traceback.print_tb(sys.exc_info()[2])
             time.sleep(1)
             screen_import2()
+        """
 
 def screen_list():
     global MTB
     clear_screen()
     try:
         for key, val in MTB.items():
-            print(key + ": " + str(val))
+            print(key)
             print()
     except:
         print(MTB)
     input("Continue: ")
+
+def screen_new():
+    label_prompt = "\t***                Input Label                ***"
+    label_input_label = "LABEL: "
+    menu = "\t***               Locker - New                ***"
+    new_label = gen_screen(label_prompt, label_input_label, True, menu)
+
+    pwd_prompt = "\t***              Input Password               ***"
+    pwd_input_label = "PASSWORD: "
+    new_pwd = gen_screen(pwd_prompt, pwd_input_label, True, menu)
+
+    lockops.add_entry(MTB, new_label, new_pwd)
+    # print(new_label, new_pwd)
+    # time.sleep(1)
+
 
 def screen_main():
     global EXIT
@@ -140,7 +164,7 @@ def screen_main():
     elif ks == "import":
         screen_import()
     elif ks == "new":
-        pass
+        screen_new()
     elif ks == "delete":
         pass
     elif ks == "decrypt":
@@ -148,24 +172,34 @@ def screen_main():
     return
 
 def cntn_main():
+    global NULLCLS
     while EXIT:
         screen_main()
     if not lockops.dir_search(None, True):  # Save file
         lockops.write_secure_tfile(MTB)
-    clear_screen()
+        clear_screen()
     return
 
 #*************************************** MAIN ********************************
 clear_screen()
 apwd = gen_screen("\t***          INPUT LOCKER COMBINATION         ***")
 if apwd != ":q":
-    if not lockops.dir_search(apwd, True, True):
-        prmpt = input("Combination is unrecognized. Create new repository? (y/n)")
-        if prmpt == "y":
-            lockops.init_secure_tfile(apwd)
+    try:
+        if not lockops.dir_search(apwd, True, True):
+            prmpt = input("Combination is unrecognized. Create new repository? (y/n)")
+            if prmpt == "y":
+                lockops.init_secure_tfile(apwd)
+                cntn_main()
+        else:
+            MTB = lockops.read_secure_tfile()
+            lockops.load_key()
             cntn_main()
-    else:
-        MTB = lockops.read_secure_tfile()
-        lockops.load_key()
-        cntn_main()
+    except Exception as ex:
+        lockops.write_secure_tfile(MTB)
+        NULLCLS = True
+        exceptn = sys.exc_info()
+        print()
+        print(str(ex).upper())
+        print()
+        traceback.print_tb(exceptn[2])
 clear_screen()

@@ -37,6 +37,13 @@ def dir_search(suf, bool=False, kfind=False):
     return False
 
 
+def add_entry(directory, label, pwd):
+    key = bin_dec(load_key().decode())
+    f = Fernet(key)
+    directory[label.lower()] = f.encrypt(bytes(pwd, "UTF-8")).decode("UTF-8")
+    return directory
+
+
 def decrypt_entry(directory, label):
     key = bin_dec(load_key().decode())
     f = Fernet(key)
@@ -52,7 +59,10 @@ def decrypt_entry(directory, label):
 def import_file(filepath, lineformat, sray):
     global ukey
     key = genkey()
-    save_key(key)
+    if not dir_search(bin_enc(ukey[:klg]) + str(klg), True):
+        save_key(key)
+    else:
+        key = bin_dec(load_key().decode())
     f = Fernet(key)
 
     lidx = lineformat.index('LABEL')
@@ -85,16 +95,6 @@ def import_file(filepath, lineformat, sray):
     write_secure_tfile(sray)
     return read_secure_tfile()
 
-# Deprecated check to JSON file, may be reinstated later
-"""
-def load_fp():  # Retrieve JSON file
-    global repo_path
-    with open("sc/dump.json", "r") as dfile:
-        fp = json.load(dfile)
-        if len(fp) > 0:
-            return fp
-    return False
-"""
 
 # https://www.logilab.org/blogentry/17873
 # https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp
