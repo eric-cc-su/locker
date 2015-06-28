@@ -4,21 +4,23 @@ Locker
 
 Locker is an ***experimental***, trying-to-learn-new-things, terminal Python password manager. The program uses the `cryptography` Python library to encrypt and store key, password pairs. The idea is to be able to securely save and serve passwords for the user, as well as encrypt the user's files as requested.
 
-#Using Locker
-
-In the terminal, navigate to the Locker directory and run locker.py as a python script
-
-	cd */locker
-	python locker.py
-
-###Requirements
+##Prerequisites
 
 - Python 3
 - The [Cryptography](https://cryptography.io/en/latest/) Python library
 
+##Running Locker
+
+In the terminal, navigate to the Locker directory and run locker.py as a python script using **Python 3**
+
+	cd */locker
+	python locker.py
+
 ##Initial Authentication
 
 When running Locker, you will first need to supply a "locker combination". Currently (06/24/15), any unrecognized locker combinations will ask the user if they wish to create a new repository. This allows users to have multiple, isolated "databases". Make sure you are using the correct locker combination to access the desired sensitive data.
+
+##Functions
 
 ###List
 
@@ -60,7 +62,7 @@ In development.
 
 `decrypt` will be used to serve a key, value pair's value to the user. The user will input the key and the key's value will be decrypted and served to the user. If `encrypt` is developed to encrypt individual files, decrypt will have the ability to either decrypt or serve the file.
 
-In development.
+Decryption of key, value pair functional.
 
 #***DISCLAIMER***
 
