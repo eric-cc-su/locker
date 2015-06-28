@@ -62,6 +62,16 @@ def screen_decrypt():
         lockops.decrypt_entry(MTB, ks)
         input("PRESS ENTER TO CONTINUE")
 
+def screen_delete():
+    prompt = "\t*** INPUT ENTRY LABEL                         ***"
+    menu = "\t***              Locker - Delete              ***"
+    ks = gen_screen(prompt ,'LABEL: ', True).strip().lower()
+    if ks == ":q":
+        screen_main()
+    else:
+        lockops.delete_entry(MTB, ks)
+        input("PRESS ENTER TO CONTINUE")
+
 def screen_import():
     global IFILE
     clear_screen()
@@ -166,7 +176,7 @@ def screen_main():
     elif ks == "new":
         screen_new()
     elif ks == "delete":
-        pass
+        screen_delete()
     elif ks == "decrypt":
         screen_decrypt()
     return

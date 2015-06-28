@@ -6,7 +6,7 @@ Locker is an ***experimental***, trying-to-learn-new-things, terminal Python pas
 
 ##Prerequisites
 
-- Python 3
+- [Python 3](https://www.python.org/)
 - The [Cryptography](https://cryptography.io/en/latest/) Python library
 
 ##Running Locker
@@ -41,15 +41,15 @@ Functional
 
 ###New
 
-The `new` function will allow the user to add a new key, value pair. 
+The `new` function will allow the user to add a new key, value pair.
 
-In development
+Functional
 
 ###Delete
 
-Delete a key, value pair. 
+Delete a key, value pair.
 
-In development
+Functional
 
 ###Encrypt
 

@@ -55,6 +55,9 @@ def decrypt_entry(directory, label):
     except KeyError:
         print("No matching entry in repository")
 
+def delete_entry(directory, label):
+    del directory[label.lower()]
+    return directory
 
 def import_file(filepath, lineformat, sray):
     global ukey
