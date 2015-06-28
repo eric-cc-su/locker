@@ -37,10 +37,16 @@ def dir_search(suf, bool=False, kfind=False):
     return False
 
 
-def decrypt_entry(label):
+def decrypt_entry(directory, label):
     key = bin_dec(load_key().decode())
     f = Fernet(key)
-    print("decrypt")
+
+    try:
+        retrieve = directory[label.lower()]
+        recieved = f.decrypt(retrieve.encode()).decode()
+        print(recieved)
+    except KeyError:
+        print("No matching entry in repository")
 
 
 def import_file(filepath, lineformat, sray):
@@ -74,7 +80,7 @@ def import_file(filepath, lineformat, sray):
                 label = hival
                 passwd = loval
 
-            sray[label] = f.encrypt(bytes(passwd, "UTF-8")).decode("UTF-8")
+            sray[label.lower()] = f.encrypt(bytes(passwd, "UTF-8")).decode("UTF-8")
 
     write_secure_tfile(sray)
     return read_secure_tfile()

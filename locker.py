@@ -50,7 +50,8 @@ def screen_decrypt():
     if ks == ":q":
         screen_main()
     else:
-        lockops.decrypt_entry(ks)
+        lockops.decrypt_entry(MTB, ks)
+        input("PRESS ENTER TO CONTINUE")
 
 def screen_import():
     global IFILE
