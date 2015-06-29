@@ -51,10 +51,10 @@ def decrypt(directory, label):
     f = Fernet(key)
 
     if os.path.isfile(label):
-        with open(filepath, 'r') as efile:
+        with open(label, 'r') as efile:
             blockdata = efile.read()
 
-        with open(filepath,'w') as wfile:
+        with open(label,'w') as wfile:
             wfile.write(f.decrypt(bytes(blockdata, 'UTF-8')).decode())
         print("FILE DECRYPTED")
     else:
@@ -192,6 +192,10 @@ def load_key():
     global klg
 
     apath = dir_search(bin_enc(ukey[:klg]) + str(klg))
+    if type(apath) == bool and not apath:
+        apath = dir_search(bin_enc(ukey[:klg]))
+        if apath == False:
+            raise Exception("DIR_SEARCH COULD NOT FIND KEY FILE")
     fd = os.open(apath, os.O_RDONLY)
     obj = os.read(fd, 100)
     os.close(fd)
@@ -205,6 +209,6 @@ def save_key(key):  # Save F key
 
     tk = bin_enc(key).encode()
     klg = round( ord(os.urandom(1))/(ord(os.urandom(1))+1) ) + 1
-    fd, repo_path = mkstemp(suffix=( bin_enc(ukey[:klg]) + str(klg)) )  # Create file
+    fd, repo_path = mkstemp(suffix=( bin_enc(ukey[:klg]) + str(klg) ))  # Create file
     os.write(fd, tk)
     os.close(fd)
