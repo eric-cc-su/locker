@@ -53,13 +53,13 @@ def gen_screen(prompt, input_text="INPUT: ", back=False, menu=None):
     return( input(input_text) )
 
 def screen_decrypt():
-    prompt = "\t*** INPUT ENTRY LABEL                         ***"
     menu = "\t***              Locker - Decrypt             ***"
-    ks = gen_screen(prompt ,'LABEL: ', True).strip().lower()
+    prompt = "\t*** Input entry name or file path:            ***"
+    ks = gen_screen(prompt ,'ENTRY/FILE: ', True).strip().lower()
     if ks == ":q":
         screen_main()
     else:
-        lockops.decrypt_entry(MTB, ks)
+        lockops.decrypt(MTB, ks)
         input("PRESS ENTER TO CONTINUE")
 
 def screen_delete():
@@ -70,6 +70,16 @@ def screen_delete():
         screen_main()
     else:
         lockops.delete_entry(MTB, ks)
+        input("PRESS ENTER TO CONTINUE")
+
+def screen_encrypt():
+    prompt = "\t*** INPUT FILE PATH                           ***"
+    menu = "\t***              Locker - Encrypt             ***"
+    ks = gen_screen(prompt ,'FILE: ', True).strip().lower()
+    if ks == ":q":
+        screen_main()
+    else:
+        lockops.encrypt_file(ks)
         input("PRESS ENTER TO CONTINUE")
 
 def screen_import():
@@ -160,7 +170,8 @@ def screen_main():
     print("\t*** import - import from text file            ***")
     print("\t*** new    - create new entry                 ***")
     print("\t*** delete - delete entry                     ***")
-    print("\t*** decrypt- decrypt entry                    ***")
+    print("\t*** encrypt - encrypt file                    ***")
+    print("\t*** decrypt - decrypt entry                   ***")
     print("\t***                                           ***")
     print("\t*** :q     - close application                ***")
     print("\t*************************************************")
@@ -177,6 +188,8 @@ def screen_main():
         screen_new()
     elif ks == "delete":
         screen_delete()
+    elif ks == "encrypt":
+        screen_encrypt()
     elif ks == "decrypt":
         screen_decrypt()
     return

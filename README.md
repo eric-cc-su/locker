@@ -55,14 +55,14 @@ Functional
 
 `encrypt` will be used to encrypt files unrelated to Locker. The user will provide the filepath and a key to encrypt the file. The file will only be decryptable with the proper key.
 
-In development.
+Functional
 
 
 ###Decrypt
 
 `decrypt` will be used to serve a key, value pair's value to the user. The user will input the key and the key's value will be decrypted and served to the user. If `encrypt` is developed to encrypt individual files, decrypt will have the ability to either decrypt or serve the file.
 
-Decryption of key, value pair functional.
+Functional: decrypts key, value pairs and files
 
 #***DISCLAIMER***
 

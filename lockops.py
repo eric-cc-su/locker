@@ -5,12 +5,14 @@ except:
     raise Exception("The system is not properly initialized")
 import json
 import os, os.path
+import sys
 import time
 
 from tempfile import mkstemp
 
 ukey = ""   # user's input combo
 klg = 0     # length of file key to look for
+
 
 def dir_search(suf, bool=False, kfind=False):
     global klg
@@ -44,20 +46,46 @@ def add_entry(directory, label, pwd):
     return directory
 
 
-def decrypt_entry(directory, label):
+def decrypt(directory, label):
     key = bin_dec(load_key().decode())
     f = Fernet(key)
 
-    try:
-        retrieve = directory[label.lower()]
-        recieved = f.decrypt(retrieve.encode()).decode()
-        print(recieved)
-    except KeyError:
-        print("No matching entry in repository")
+    if os.path.isfile(label):
+        with open(filepath, 'r') as efile:
+            blockdata = efile.read()
+
+        with open(filepath,'w') as wfile:
+            wfile.write(f.decrypt(bytes(blockdata, 'UTF-8')).decode())
+        print("FILE DECRYPTED")
+    else:
+        try:
+            retrieve = directory[label.lower()]
+            recieved = f.decrypt(retrieve.encode()).decode()
+            print(recieved)
+        except KeyError:
+            print("No matching entry in repository")
+
 
 def delete_entry(directory, label):
     del directory[label.lower()]
     return directory
+
+
+def encrypt_file(filepath):
+    key = bin_dec(load_key().decode())
+    f = Fernet(key)
+
+    if os.path.isfile(filepath):
+        with open(filepath, 'r') as efile:
+            blockdata = efile.read()
+        with open(filepath,'w') as wfile:
+            wfile.write(f.encrypt(bytes(blockdata, 'UTF-8')).decode())
+        print("FILE ENCRYPTED")
+
+    else:
+        print("File not found!")
+        time.sleep(1.5)
+
 
 def import_file(filepath, lineformat, sray):
     global ukey
