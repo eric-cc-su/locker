@@ -11,9 +11,7 @@ Locker is an ***experimental***, trying-to-learn-new-things, terminal Python pas
 
 ##Compatibility
 
-Locker has been developed and tested on Windows 7 and OS X 10.10 (Yosemite) and is therefore should be compatible on Windows and OS X. Linux distros have not been tested therefore there may be some unwanted side effects with use on Linux. 
-
-Note that on OS X, the storage of encryption keys exists in a **volatile directory** that the operating system will clean out periodically. The equivalent directory on Windows is non-volatile so Locker will be long term on Windows. This issue is planned to be addressed.
+Locker has been developed and tested on Windows 7 and OS X 10.10 (Yosemite) and is therefore should be compatible on Windows and OS X. Linux distros have not been tested therefore there may be some unwanted side effects with use on Linux.
 
 ##Running Locker
 
