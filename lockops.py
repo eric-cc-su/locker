@@ -13,16 +13,37 @@ from tempfile import mkstemp
 ukey = ""   # user's input combo
 klg = 0     # length of file key to look for
 
+def create_file(sfx=None):
+    if sys.platform != "darwin":
+        fd, filepath = mkstemp(suffix=sfx)
+    else:
+        fn_prefix = ""
+        for num in range(ord(os.urandom(1)) % 100):
+            trial = os.urandom(1)
+            while ord(trial) < 33 or ord(trial) > 126 or ord(trial) in [47, 92]:  #writeable characters
+                trial = os.urandom(1)
+            fn_prefix += trial.decode()
+        filepath = os.path.join("store", fn_prefix + sfx)
+        with open(filepath, "w") as fd:
+            pass
+        fd = os.open(filepath, 493)
+
+    return fd, filepath
 
 def dir_search(suf, bool=False, kfind=False):
     global klg
     global ukey
     if suf == None:
         suf = ukey
-    fd, tpath = mkstemp()
-    directory = os.path.dirname(tpath)
-    os.close(fd)
-    os.remove(tpath)
+    if sys.platform != "darwin":  # Not OS X
+        fd, tpath = mkstemp()
+        directory = os.path.dirname(tpath)
+        os.close(fd)
+        os.remove(tpath)
+    else:
+        if not os.path.isdir("store"):
+            os.mkdir("store", 493)
+        directory = "store"
 
     for fname in os.listdir(directory):
         if fname.endswith(suf) and fname[:2] != "+~":
@@ -39,14 +60,14 @@ def dir_search(suf, bool=False, kfind=False):
     return False
 
 
-def add_entry(directory, label, pwd):
+def add_entry(directory_obj, label, pwd):
     key = bin_dec(load_key().decode())
     f = Fernet(key)
-    directory[label.lower()] = f.encrypt(bytes(pwd, "UTF-8")).decode("UTF-8")
-    return directory
+    directory_obj[label.lower()] = f.encrypt(bytes(pwd, "UTF-8")).decode("UTF-8")
+    return directory_obj
 
 
-def decrypt(directory, label):
+def decrypt(directory_obj, label):
     key = bin_dec(load_key().decode())
     f = Fernet(key)
 
@@ -59,15 +80,15 @@ def decrypt(directory, label):
         print("FILE DECRYPTED")
     else:
         try:
-            retrieve = directory[label.lower()]
-            recieved = f.decrypt(retrieve.encode()).decode()
-            print(recieved)
+            retrieve = directory_obj[label.lower()]
+            received = f.decrypt(retrieve.encode()).decode()
+            print(received)
         except KeyError:
             print("No matching entry in repository")
 
 
-def delete_entry(directory, label):
-    del directory[label.lower()]
+def delete_entry(directory_obj, label):
+    del directory_obj[label.lower()]
     return directory
 
 
@@ -111,9 +132,10 @@ def import_file(filepath, lineformat, sray):
     with open(filepath, "r") as ifile:
         for line in ifile:
             loval = line[line.index(pre):line.index(mid)]
-            hival = line[line.index(mid) + len(mid):line.index(suf)]
             if suf == "":
                 hival = line[line.index(mid) + len(mid):]
+            else:
+                hival = line[line.index(mid) + len(mid):line.index(suf)]
 
             label = loval
             passwd = hival
@@ -154,7 +176,7 @@ def write_secure_tfile(data):  # Write tmp file
         os.remove(repo_path)
     except TypeError:
         pass
-    fd, repo_path = mkstemp(suffix=str(klg) + ukey)  # Create file
+    fd, repo_path = create_file(str(klg) + ukey)  # Create file
     os.write(fd, bobj)
     os.close(fd)
 
@@ -181,6 +203,17 @@ def bin_dec(data):  # decoding
             item = ""
     return trial
 
+def enc2(data, datatype="str"):
+    trial = ""
+    binconvert = ""
+    if type(data) == bytes:
+        data = data.decode()
+    for letter in data:
+        testch = os.urandom(1)
+        while ord(testch) < 33 and ord(testch) > 126:
+            testch = os.urandom(1)
+        trial += format(ord(testch), "#010b")[2:]
+        #32(space) - 126
 
 def genkey():  # Generate F key
     key = Fernet.generate_key()
@@ -209,6 +242,6 @@ def save_key(key):  # Save F key
 
     tk = bin_enc(key).encode()
     klg = round( ord(os.urandom(1))/(ord(os.urandom(1))+1) ) + 1
-    fd, repo_path = mkstemp(suffix=( bin_enc(ukey[:klg]) + str(klg) ))  # Create file
+    fd, repo_path = create_file(bin_enc(ukey[:klg]) + str(klg))
     os.write(fd, tk)
     os.close(fd)

@@ -208,7 +208,6 @@ clear_screen()
 apwd = gen_screen("\t***          INPUT LOCKER COMBINATION         ***")
 if apwd != ":q":
     try:
-        print(lockops.dir_search(apwd, True, True))
         if not lockops.dir_search(apwd, True, True):
             prmpt = input("Combination is unrecognized. Create new repository? (y/n)")
             if prmpt == "y":
