@@ -11,7 +11,7 @@ Locker is an ***experimental***, trying-to-learn-new-things, terminal Python pas
 
 ##Compatibility
 
-Locker has been developed and tested on Windows 7 and OS X 10.10 (Yosemite) and is therefore should be compatible on Windows and OS X. Linux distros have not been tested therefore there may be some unwanted side effects with use on Linux.
+Locker has been developed and tested on Windows 7 and OS X 10.10 (Yosemite). Locker has **not** yet been tested on Linux distros and may or may not produce unwanted side effects.
 
 ##Running Locker
 
