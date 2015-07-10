@@ -13,6 +13,7 @@ from tempfile import mkstemp
 ukey = ""   # user's input combo
 klg = 0     # length of file key to look for
 
+#file interactions
 def create_file(sfx=None):
     if sys.platform != "darwin":
         fd, filepath = mkstemp(suffix=sfx)
@@ -24,11 +25,26 @@ def create_file(sfx=None):
                 trial = os.urandom(1)
             fn_prefix += trial.decode()
         filepath = os.path.join("store", fn_prefix + sfx)
-        with open(filepath, "w") as fd:
+        with open(filepath, "w+b") as fd:
             pass
-        fd = os.open(filepath, 493)
-
+        fd = os.open(filepath, os.O_RDWR)
     return fd, filepath
+
+def close_file(fd, fpath):
+    os.close(fd)
+    if sys.platform == "darwin":
+        os.chmod(fpath, 256)
+
+def open_file(fpath, mode):
+    os.chmod(fpath, 448)
+    fd = os.open(fpath, mode)
+    return fd
+
+def secure_directory():
+    if sys.platform == "darwin":
+        os.chmod("store", 256)
+
+#end file interactions
 
 def dir_search(suf, bool=False, kfind=False):
     global klg
@@ -42,8 +58,9 @@ def dir_search(suf, bool=False, kfind=False):
         os.remove(tpath)
     else:
         if not os.path.isdir("store"):
-            os.mkdir("store", 493)
+            os.mkdir("store", 448)
         directory = "store"
+    os.chmod("store", 448)
 
     for fname in os.listdir(directory):
         if fname.endswith(suf) and fname[:2] != "+~":
@@ -56,6 +73,7 @@ def dir_search(suf, bool=False, kfind=False):
 
             if bool:
                 return True
+            os.chmod(apath, 493)
             return apath
     return False
 
@@ -89,7 +107,7 @@ def decrypt(directory_obj, label):
 
 def delete_entry(directory_obj, label):
     del directory_obj[label.lower()]
-    return directory
+    return directory_obj
 
 
 def encrypt_file(filepath):
@@ -143,7 +161,7 @@ def import_file(filepath, lineformat, sray):
                 label = hival
                 passwd = loval
 
-            sray[label.lower()] = f.encrypt(bytes(passwd, "UTF-8")).decode("UTF-8")
+            sray[label.lower().strip()] = f.encrypt(bytes(passwd.strip(), "UTF-8")).decode("UTF-8")
 
     write_secure_tfile(sray)
     return read_secure_tfile()
@@ -178,7 +196,7 @@ def write_secure_tfile(data):  # Write tmp file
         pass
     fd, repo_path = create_file(str(klg) + ukey)  # Create file
     os.write(fd, bobj)
-    os.close(fd)
+    close_file(fd, repo_path)
 
 
 def bin_enc(data, datatype="str"):  # Simple cipher using binary, and hex translations
@@ -231,7 +249,7 @@ def load_key():
             raise Exception("DIR_SEARCH COULD NOT FIND KEY FILE")
     fd = os.open(apath, os.O_RDONLY)
     obj = os.read(fd, 100)
-    os.close(fd)
+    close_file(fd, apath)
 
     return obj
 
@@ -243,5 +261,6 @@ def save_key(key):  # Save F key
     tk = bin_enc(key).encode()
     klg = round( ord(os.urandom(1))/(ord(os.urandom(1))+1) ) + 1
     fd, repo_path = create_file(bin_enc(ukey[:klg]) + str(klg))
+    time.sleep(2)
     os.write(fd, tk)
-    os.close(fd)
+    close_file(fd, repo_path)

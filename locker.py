@@ -153,9 +153,6 @@ def screen_new():
     new_pwd = gen_screen(pwd_prompt, pwd_input_label, True, menu)
 
     lockops.add_entry(MTB, new_label, new_pwd)
-    # print(new_label, new_pwd)
-    # time.sleep(1)
-
 
 def screen_main():
     global EXIT
@@ -200,6 +197,7 @@ def cntn_main():
         screen_main()
     if not lockops.dir_search(None, True):  # Save file
         lockops.write_secure_tfile(MTB)
+        lockops.secure_directory()
         clear_screen()
     return
 
