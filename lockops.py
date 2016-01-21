@@ -40,12 +40,14 @@ def open_file(fpath, mode):
     fd = os.open(fpath, mode)
     return fd
 
+#Change file permissions
 def secure_directory():
     if sys.platform == "darwin":
         os.chmod("store", 256)
 
 #end file interactions
 
+#Search store directory for file with suffix
 def dir_search(suf, bool=False, kfind=False):
     global klg
     global ukey
@@ -63,7 +65,9 @@ def dir_search(suf, bool=False, kfind=False):
     os.chmod("store", 448)
 
     for fname in os.listdir(directory):
-        if fname.endswith(suf) and fname[:2] != "+~":
+        #Changed 01/21/16: KeyboardInterrupt bug "hides" files with `+~` prefix
+        #if fname.endswith(suf) and fname[:2] != "+~":
+        if fname.endswith(suf):
             if kfind:
                 klg = int(fname[-(len(suf)+1)])  # klg placed right before ukey
             apath = os.path.join(directory, fname)
@@ -77,14 +81,14 @@ def dir_search(suf, bool=False, kfind=False):
             return apath
     return False
 
-
+#Add key, value pair to store file
 def add_entry(directory_obj, label, pwd):
     key = bin_dec(load_key().decode())
     f = Fernet(key)
     directory_obj[label.lower()] = f.encrypt(bytes(pwd, "UTF-8")).decode("UTF-8")
     return directory_obj
 
-
+#Decrypt the file or key, value pair
 def decrypt(directory_obj, label):
     key = bin_dec(load_key().decode())
     f = Fernet(key)
@@ -104,12 +108,12 @@ def decrypt(directory_obj, label):
         except KeyError:
             print("No matching entry in repository")
 
-
+#Delete key, value pair from store file
 def delete_entry(directory_obj, label):
     del directory_obj[label.lower()]
     return directory_obj
 
-
+#Encrypt file
 def encrypt_file(filepath):
     key = bin_dec(load_key().decode())
     f = Fernet(key)
